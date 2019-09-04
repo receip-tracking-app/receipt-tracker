@@ -24,6 +24,6 @@ End Point | Description
 
 ```javascript
  {
- 
+ //add data here
   }
 ```
