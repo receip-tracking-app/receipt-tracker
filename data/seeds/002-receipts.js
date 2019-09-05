@@ -6,15 +6,15 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('receipts').insert([
         { id: 1,
-          tansactionDate: '',
+          transactionDate: '',
           merchant: 'Wal-Mart',
           amountSpent: '20.56' 
         },{ id: 2,
-          tansactionDate: '',
+          transactionDate: '',
           merchant: 'Shell Corner Store',
           amountSpent: '30.00' 
         },{ id: 3,
-          tansactionDate: '',
+          transactionDate: '',
           merchant: 'Carls JR',
           amountSpent: '9.27' 
         },

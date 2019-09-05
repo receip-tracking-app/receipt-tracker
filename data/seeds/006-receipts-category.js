@@ -1,13 +1,23 @@
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries
-  return knex('table_name').del()
+  return knex('receipts_category').truncate()
     .then(function () {
       // Inserts seed entries
-      return knex('table_name').insert([
-        {id: 1, colName: 'rowValue1'},
-        {id: 2, colName: 'rowValue2'},
-        {id: 3, colName: 'rowValue3'}
+      return knex('receipts_category').insert([
+        {
+           receipts_id: 1 ,
+           category: 4
+          },
+          {
+            receipts_id: 2 ,
+            category: 2
+           },
+           {
+            receipts_id: 3 ,
+            category: 1
+           },
+          
       ]);
     });
 };

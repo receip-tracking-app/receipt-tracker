@@ -1,13 +1,20 @@
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries
-  return knex('table_name').del()
+  return knex('rimages').truncate()
     .then(function () {
       // Inserts seed entries
-      return knex('table_name').insert([
-        {id: 1, colName: 'rowValue1'},
-        {id: 2, colName: 'rowValue2'},
-        {id: 3, colName: 'rowValue3'}
+      return knex('rimages').insert([
+        {id: 1, 
+          imageURL: 'image1.jpg'
+        },
+        {id: 2, 
+          imageURL: 'image2.jpg'
+        },
+        {id: 3, 
+          imageURL: 'image3.jpg'
+        },
+        
       ]);
     });
 };

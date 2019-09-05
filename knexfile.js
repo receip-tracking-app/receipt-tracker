@@ -17,8 +17,9 @@ module.exports = {
     pool: {
       afterCreate: (conn, done) => {
         conn.run('PRAGMA foreign_keys = ON', done);
-      }
+      },
   },
+},
 
   staging: {
     client: 'postgresql',
