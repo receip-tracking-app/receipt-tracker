@@ -13,8 +13,8 @@ const getAllRecipts = () => {
     return db('receipts');
 };
 
-const getAllReceiptsByUser = () => {
-
+const getAllReceiptsByUser = (user_id) => {
+    
 };
 
 const getReceipt = (receipt_id) => {

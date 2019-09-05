@@ -17,6 +17,14 @@ exports.seed = function(knex) {
           transactionDate: '',
           merchant: 'Carls JR',
           amountSpent: '9.27' 
+        },{ id: 4,
+          transactionDate: '',
+          merchant: 'Jack In The Box',
+          amountSpent: '5.88' 
+        },{ id: 5,
+          transactionDate: '',
+          merchant: 'Valero',
+          amountSpent: '50.01' 
         },
   
       ]);

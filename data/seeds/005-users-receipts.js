@@ -17,6 +17,14 @@ exports.seed = function(knex) {
           users_id: 3,
           receipts_id: 3
         },
+        {
+          users_id: 1,
+          receipts_id: 4
+        }, 
+        {
+          users_id: 1,
+          receipts_id: 5
+        },
       ]);
     });
 };

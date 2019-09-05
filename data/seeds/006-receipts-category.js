@@ -17,6 +17,14 @@ exports.seed = function(knex) {
             receipts_id: 3 ,
             category: 1
            },
+           {
+            receipts_id: 4 ,
+            category: 1
+           },
+           {
+            receipts_id: 5 ,
+            category: 2
+           },
           
       ]);
     });
