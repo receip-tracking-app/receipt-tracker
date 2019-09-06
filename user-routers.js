@@ -35,6 +35,7 @@ server.post("/login", (req, res) => {
         .then(user => {
             if (user && bcrypt.compareSync(password, user.password)) {
                 req.session.username = user.username;
+                req.session.user_id = user.id;
                 req.session.loggedIn = true;
                 res.status(200).json({ message: `Welcome ${user.username}!` });
             } else {
@@ -64,129 +65,98 @@ function authenticate(req, res, next) {
     }
 }
 
-router.post("/", async (req, res) => {
-    const newPost = req.body;
-
-    if (newPost.title && newPost.contents) {
-        try {
-            const post = await Posts.insert(req.body);
-            res.status(201).json(post);
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({
-                message:
-                    "There was an error while saving the user to the database"
-            });
-        }
-    } else {
-        res.status(400).json({
-            err: "Please provide title and contents for the post."
-        });
-    }
-});
-
-router.post("/:id/comments", async (req, res) => {
-    const commentData = { ...req.body, post_id: req.params.id };
+router.post("/api/receipt", authenticate, async (req, res) => {
+    const receiptData = { ...req.body, user_id: req.session.user_id };
 
     try {
-        const saved = await Hubs.insertComment(commentData);
+        const saved = await Hubs.insertReceipt(receiptData);
         res.status(201).json(saved);
     } catch (err) {
         res.status(500).json({
-            message: "failed to save message",
+            message: "Failed to save receipt",
             err
         });
     }
 });
 
-router.get("/", async (req, res) => {
+router.get("/api/logedinuser", authenticate, async (req, res) => {
     try {
-        const posts = await Posts.find(req.query);
-        res.status(200).json(posts);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            message: "The posts information could not be retrieved."
-        });
-    }
-});
+        const user = await Users.findById(req.session.user_id);
 
-router.get("/:id", async (req, res) => {
-    try {
-        const post = await Posts.findById(req.params.id);
-
-        if (post) {
-            res.status(200).json(post);
+        if (user) {
+            res.status(200).json(user);
         } else {
             res.status(404).json({
-                message: "The post with the specified ID does not exist"
+                message: "The user with the specified ID does not exist"
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: "The post information could not be retrieved"
+            message: "The user information could not be retrieved"
         });
     }
 });
 
-router.get("/:id/comments", async (req, res) => {
+router.get("/api/receipts", authenticate, async (req, res) => {
     try {
-        const comments = await Posts.findCommentById(req.params.id);
+        const receipts = await Users.findReceiptsById(req.session.user_id);
 
-        if (comments.length) {
-            res.json(comments);
+        if (array.length !== 0) {
+            res.json(receipts);
         } else {
             res.status(404).json({
-                err: "The post with the specified ID does not exist."
+                err: "The user with the specified ID does not exist."
             });
         }
     } catch (err) {
         res.status(500).json({
-            err: "The comments information could not be retrieved."
+            err: "The receipts information could not be retrieved."
         });
     }
 });
+
 server.get("/logout", (req, res) => {
     req.session.destroy(function(err) {
         res.status(200).json({ message: "Hope to see you soon again" });
     });
 });
-router.put("/:id", async (req, res) => {
-    const updatedPost = req.body;
+
+router.put("/api/receipt/:id ", authenticate, async (req, res) => {
+    const updatedReceipt = req.body;
 
     if (updatedPost.title && updatedPost.contents) {
         try {
-            const post = await Posts.update(req.params.id, req.body);
+            const receipt = await Receipt.update(req.params.id, req.body);
             res.status(200).json(post);
         } catch (err) {
             console.log(err);
             res.status(500).json({
-                message: "The post information could not be modified."
+                message: "The receipt information could not be modified."
             });
         }
     } else {
         res.status(400).json({
-            err: "Please provide title and contents for the post."
+            err: "Please provide title and contents for the receipt."
         });
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/api/receipt/:id", authenticate, async (req, res) => {
     try {
-        const post = await Posts.remove(req.params.id);
+        const receipt = await Receipt.remove(req.params.id);
 
-        if (post) {
-            res.status(200).json(post);
+        if (receipt) {
+            res.status(200).json(receipt);
         } else {
             res.status(404).json({
-                message: "The post with the specified ID does not exist."
+                message: "The receipt with the specified ID does not exist."
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: "The post could not be removed."
+            message: "The receipt could not be removed."
         });
     }
 });
