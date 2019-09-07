@@ -17,18 +17,22 @@ const getAllReceiptsByUser = (user_id) => {
     return db('users_receipts as ur')
     .join('receipts as r', 'ur.receipts_id', '=', 'r.id')
     .join('users as u', 'ur.users_id', '=', 'u.id')
-    .where('u.id','=', user_id);
+    .where('u.id','=', user_id).select('r.id', 'merchant', 'transactionDate', 'amountSpent', 'r.created_at');
 };
 
 const getAllCategories = () => {
     return db('category');
 };
 
+const getCategoryByName = (category_name) => {
+    return db('category').where('categoryName', '=', category_name).select('id');
+};
+
 const getReceipt = (receipt_id) => {
     return db('receipts_category')
         .join('receipts','receipts_category.receipts_id', '=', 'receipts.id')
         .join('category', 'receipts_category.category','=','category.id')
-        .join('receipts_rimages', 'receipts_rimages.receipts_id', '=', 'receipts.id')
+      //  .join('receipts_rimages', 'receipts_rimages.receipts_id', '=', 'receipts.id')
         .where('receipts.id', '=', receipt_id);
 };
 
@@ -42,9 +46,13 @@ const filterReceiptsBy = (user_id, filter, value) => {
         .andWhere('users_id', '=', user_id);
 }; 
 
+const getRImages = () => {
+    return db('rimages');
+}
+
 const addUser = (user) => {
     return db('users').insert(user);
-}
+};
 
 
 //POST- add a category
@@ -53,7 +61,22 @@ const addCategory = (category) => {
 };
 
 //POST- add a receipt
+const addReciept  = (receipt) => {
+    return db('receipts').insert(receipt);
+};
 
+//POST- add Image 
+const addImage = (image_url) => {
+    return db('rimages').insert(image_url)
+};
+
+const addToUsersReceiptsTbl = (recordFK) => {
+    return db('users_receipts').insert(recordFK);
+};
+
+const addToReceiptsCategoryTbl = (recordFK) => {
+    return db('receipts_category').insert(recordFK);
+};
 
 //POST- add a image and associate with a receipt
 //PUT- update users imformation 
@@ -77,6 +100,12 @@ module.exports = {
     getAllReceiptsByUser,
     filterReceiptsBy,
     addUser, 
+    addToUsersReceiptsTbl,
     addCategory,
-    getAllCategories
+    addReciept,
+    getAllCategories, 
+    getCategoryByName,
+    addImage,
+    getRImages,
+    addToReceiptsCategoryTbl
 };
