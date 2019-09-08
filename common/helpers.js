@@ -48,7 +48,7 @@ const filterReceiptsBy = (user_id, filter, value) => {
 
 const getRImages = () => {
     return db('rimages');
-}
+};
 
 const addUser = (user) => {
     return db('users').insert(user);
@@ -67,7 +67,7 @@ const addReciept  = (receipt) => {
 
 //POST- add Image 
 const addImage = (image_url) => {
-    return db('rimages').insert(image_url)
+    return db('rimages').insert(image_url);
 };
 
 const addToUsersReceiptsTbl = (recordFK) => {
