@@ -21,6 +21,7 @@
   "homepage": "https://github.com/receip-tracking-app/receipt-tracker#readme",
   "dependencies": {
     "bcrypt": "^3.0.6",
+    "bcryptjs": "^2.4.3",
     "cloudinary": "^1.14.0",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",

@@ -5,6 +5,10 @@ const getAllUsers = () => {
     return db('users');
 };
 
+const findUserBy = (filter) => {
+    return db('users').where(filter);
+};
+
 const getUserById = (user_id) => {
     return db('users').where('users.id', '=', user_id);
 };
@@ -98,6 +102,7 @@ module.exports = {
     getAllRecipts,
     getReceipt,
     getAllReceiptsByUser,
+    findUserBy,
     filterReceiptsBy,
     addUser, 
     addToUsersReceiptsTbl,

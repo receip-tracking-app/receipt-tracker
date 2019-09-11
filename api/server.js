@@ -5,6 +5,10 @@ const db = require('../common/helpers');
 const fileUpload = require('express-fileupload'); // need this lib to make cloudinary work
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
+const categoryRouter = require('../routes/categoryRouter');
+const receiptsRouter = require('../routes/receiptsRouter');
+const userRouter = require('../routes/userRouter');
+const registerRouter = require('../routes/authRouter');
 
 cloudinary.config({
     cloud_name: 'dbqzzps1w',
@@ -19,99 +23,11 @@ server.use(cors());
 server.use(fileUpload({
     useTempFiles: true // we need this create a temp directory to hold onto uploaded files available via express-fileupload
 }));
+server.use('/api/user', userRouter);
+server.use('/api/category', categoryRouter);
+server.use('/api/receipts', receiptsRouter);
+server.use('/api/auth', registerRouter);
 
-
-server.get('/users', async (req, res) => {
-
-    try {
-        const users = await db.getAllUsers();
-        res.status(200).json(users);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.get('/categories', async (req, res) => {
-    try{
-        const categories = await db.getAllCategories();
-        res.status(200).json(categories);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.get('/category/:name', async (req,res) => { // DELETE ME!!! I was just around for testing purposes
-    const {name} = req.params;
-    try{
-        const [{id}] = await db.getCategoryByName(name);
-        res.status(200).json(id);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.get('/receipts', async (req, res) => {
-
-
-    try {
-        const receipts = await db.getAllRecipts();
-        res.status(200).json(receipts);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.get('/user/:id', async (req, res) => {
-    const { id } = req.params;
-
-
-    try {
-        const [user] = await db.getUserById(id);
-        res.status(200).json(user);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.get('/receipt/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const receipt = await db.getReceipt(id);
-        res.status(200).json(receipt);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.get('/user/:id/receipts', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const receipts = await db.getAllReceiptsByUser(id);
-        res.status(200).json(receipts);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-
-server.get('/users/:id/filterreceiptsby/:filter/:value', async (req, res) => {
-    const { id, filter, value } = req.params;
-    try {
-        const receipts = await db.filterReceiptsBy(id, filter, value);
-        res.status(200).json(receipts);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
 
 server.get('/images', async (req, res)=> {
     try{
@@ -123,17 +39,7 @@ server.get('/images', async (req, res)=> {
     }
 });
 
-// POST REQUESTS
-server.post('/register', async (req, res) => {
-    const user = req.body;
-    try {
-        const newUser = await db.addUser(user);
-        res.status(201).json(newUser);
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
+
 
 
 server.post('/upload', async (req, res) => {
@@ -175,23 +81,6 @@ server.post('/upload', async (req, res) => {
 });
 
 
-server.post('/createCategory', async (req,res) => {
-    const newCategory = req.body;
-    try{
-        const record = await db.addCategory(newCategory);
-        res.status(201).json({message: `The category ${newCategory.categoryName} was added successfully.`})
-    }
-    catch ({ message }) {
-        res.status(500).json(message);
-    }
-});
-
-server.post('user/:id/record_receipt', (req,res)=> {
-    // here we need to record a receipt and also add the category for the receipt and also add the picture so we need to do all that
-
-});
-
-
 const cloudinaryUpload = async (fileToUpload) => {
     var cloudinaryResult = {};
         try {
@@ -227,49 +116,7 @@ server.post('/imageupload', async (req, res) => {
 });
 
 
-server.post('/user/:id/recordreceiptTest', async (req, res) => {
-    const {id} = req.params;
-    const receiptData = req.body;
-    const receipt = {
-        transactionDate: receiptData.transactionDate,
-        merchant: receiptData.merchant,
-        amountSpent: receiptData.amountSpent
-    };
 
-try{ 
- //GET The assocate Category object      
-   const [category]= await db.getCategoryByName(receiptData.categoryName); // return the category as object use category.id
-   
-//ADD the image for the recipt first if it exsists
-  //  const file = req.files.photo;
-  //  const image = {imageURL: await cloudinaryUpload(file.tempFilePath)}; // returns cloudinary uploaded image result URL
-  //  const [addedImage] = await db.addImage(image); // get the id from here addedImage.id
-
-//Now add Receipt 
-        const [addedReceipt] =  await db.addReciept(receipt);
-        console.log('here is the added receipt', addedReceipt);
-     
-//now add to receipts to user
-        const ur = {
-            users_id: id,
-            receipts_id: addedReceipt
-        };
-        await db.addToUsersReceiptsTbl(ur);
-
-// add category to receipt
-        const rc = {
-            receipts_id: addedReceipt,
-            category: category.id
-        };
-        await db.addToReceiptsCategoryTbl(rc);                    
-
-        res.send(`All clear! We have a receipt by the id of: ${addedReceipt}`);
-    }
-    catch({message}){
-        res.status(500).json({message});
-    }
-   
-});
 
 
 
