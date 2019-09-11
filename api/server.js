@@ -4,6 +4,7 @@ const express = require('express');
 const db = require('../common/helpers');
 const fileUpload = require('express-fileupload'); // need this lib to make cloudinary work
 const cloudinary = require('cloudinary').v2;
+const cors = require('cors');
 
 cloudinary.config({
     cloud_name: 'dbqzzps1w',
@@ -14,6 +15,7 @@ cloudinary.config({
 const server = express();
 
 server.use(express.json());
+server.use(cors());
 server.use(fileUpload({
     useTempFiles: true // we need this create a temp directory to hold onto uploaded files available via express-fileupload
 }));
@@ -33,7 +35,7 @@ server.get('/users', async (req, res) => {
 server.get('/categories', async (req, res) => {
     try{
         const categories = await db.getAllCategories();
-        res.status(200).json(categories)
+        res.status(200).json(categories);
     }
     catch ({ message }) {
         res.status(500).json(message);
@@ -68,7 +70,7 @@ server.get('/user/:id', async (req, res) => {
 
 
     try {
-        const user = await db.getUserById(id);
+        const [user] = await db.getUserById(id);
         res.status(200).json(user);
     }
     catch ({ message }) {

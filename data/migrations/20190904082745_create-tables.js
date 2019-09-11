@@ -22,11 +22,15 @@ exports.up = function(knex) {
     
   })
   .createTable('receipts', receipts => {
-        receipts.increments('id');
+        receipts.increments('id')
+        .notNullable();
         receipts.timestamp('created_at').defaultTo(knex.fn.now());
-        receipts.date('transactionDate');
-        receipts.string('merchant');
-        receipts.float('amountSpent');
+        receipts.date('transactionDate')
+        .notNullable();
+        receipts.string('merchant')
+        .notNullable();
+        receipts.float('amountSpent')
+        .notNullable();
   })
   .createTable('category', category => {
       category.increments('id');
