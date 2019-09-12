@@ -1,10 +1,10 @@
 const express = require('express');
 const db = require('../common/helpers');
-const authMiddleware = require('../auth/authmiddleware');
+const restricted = require('../auth/authmiddleware');
 const router = express.Router();
 
 
-router.get('/', authMiddleware ,async (req, res) => {
+router.get('/', restricted ,async (req, res) => {
 
     try {
         const users = await db.getAllUsers();
