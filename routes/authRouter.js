@@ -70,15 +70,9 @@ const genJWT = (user) => {
         expiresIn: '1h'
     };
 
-    JWT.sign(payload, secret, options);
+   return JWT.sign(payload, secret, options);
 
 };
-
-
-
-
-
-
 
 
 
