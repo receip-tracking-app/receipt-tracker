@@ -5,49 +5,68 @@ const session = require("express-session");
 const db = require("./data/dbConfig.js");
 const Users = require("./userModel.js");
 const Receipts = require("./receiptModel.js");
+const router = express.Router();
 
-const server = express();
-server.use(express.json());
-
-server.post("/register", (req, res) => {
-    let user = req.body;
-    if (user.username && user.password) {
+router.post("/register", (req, res) => {
+    if (
+        req.body.username &&
+        req.body.password &&
+        req.body.firstname &&
+        req.body.lastname
+    ) {
+        let user = req.body;
         const hash = bcrypt.hashSync(user.password, 10);
         user.password = hash;
+
         Users.add(user)
-            .then(saved => {
-                res.status(201).json(saved);
+            .then(newUser => {
+                res.status(201).json(newUser);
             })
             .catch(err => {
                 console.log(err);
-                res.status(500).json(err);
+                res.status(500).json({
+                    message: "There was an error trying to add the user."
+                });
             });
     } else {
         res.status(400).json({
-            err: "Please provide username and password."
+            message: "Please enter a username and password."
         });
     }
 });
 
-server.post("/login", (req, res) => {
+router.post("/login", (req, res) => {
     let { username, password } = req.body;
-    Users.findBy({ username })
-        .first()
-        .then(user => {
-            if (user && bcrypt.compareSync(password, user.password)) {
-                req.session.username = user.username;
-                req.session.user_id = user.id;
-                req.session.loggedIn = true;
-                res.status(200).json({ message: `Welcome ${user.username}!` });
-            } else {
-                res.status(401).json({ message: "Invalid Credentials" });
-            }
-        });
+    console.log(req.body);
+    if (username && password) {
+        Users.findBy({ username })
+            .first()
+            .then(user => {
+                if (user && bcrypt.compareSync(password, user.password)) {
+                    req.session.username = user.userName;
+                    req.session.user_id = user.id;
+                    req.session.loggedIn = true;
+                    req.session.save(err => {
+                        if (!err) {
+                            console.log(req.session.id);
+                            res.status(200).json({
+                                message: `Welcome ${user.userName} ${user.id}! `
+                            });
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    res.status(401).json({ message: "Invalid Credentials" });
+                }
+            });
+    } else {
+        res.status(400).json({ message: "No Credentials Provided" });
+    }
 });
 
 function authenticate(req, res, next) {
     const { username, password } = req.headers;
-
     if (username && password) {
         Users.findBy({ username })
             .first()
@@ -66,7 +85,7 @@ function authenticate(req, res, next) {
     }
 }
 
-router.post("/api/receipt", authenticate, async (req, res) => {
+router.post("/receipt", authenticate, async (req, res) => {
     const receiptData = { ...req.body, user_id: req.session.user_id };
 
     try {
@@ -80,7 +99,8 @@ router.post("/api/receipt", authenticate, async (req, res) => {
     }
 });
 
-router.get("/api/logedinuser", authenticate, async (req, res) => {
+router.get("/logedinuser", async (req, res) => {
+    console.log(req.session.id);
     try {
         const user = await Users.findById(req.session.user_id);
 
@@ -94,12 +114,14 @@ router.get("/api/logedinuser", authenticate, async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: "The user information could not be retrieved"
+            message: "The user information could not be retrieved",
+            errormessage: error.message
         });
     }
+    console.log("Mistake", req.session.user_id);
 });
 
-router.get("/api/receipts", authenticate, async (req, res) => {
+router.get("/receipts", authenticate, async (req, res) => {
     try {
         const receipts = await Users.get(req.session.user_id);
 
@@ -129,13 +151,13 @@ router.get("/api/receipts", authenticate, async (req, res) => {
 //}
 //});
 
-server.get("/logout", (req, res) => {
+router.get("/logout", (req, res) => {
     req.session.destroy(function(err) {
         res.status(200).json({ message: "Hope to see you soon again" });
     });
 });
 
-router.put("/api/receipt/:id ", authenticate, async (req, res) => {
+router.put("/receipt/:id ", authenticate, async (req, res) => {
     const updatedReceipt = req.body;
 
     if (updatedPost.title && updatedPost.contents) {
@@ -155,7 +177,7 @@ router.put("/api/receipt/:id ", authenticate, async (req, res) => {
     }
 });
 
-router.delete("/api/receipt/:id", authenticate, async (req, res) => {
+router.delete("/receipt/:id", authenticate, async (req, res) => {
     try {
         const receipt = await Receipt.remove(req.params.id);
 
@@ -174,4 +196,4 @@ router.delete("/api/receipt/:id", authenticate, async (req, res) => {
     }
 });
 
-module.exports = server;
+module.exports = router;
