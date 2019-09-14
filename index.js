@@ -1,4 +1,5 @@
 //setup server index
+require('dotenv').config();
 
 const server = require('./api/server');
 

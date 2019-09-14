@@ -6,8 +6,6 @@ const router = express.Router();
 
 //Get All Receipts
 router.get('/receipts', async (req, res) => {
-
-
     try {
         const receipts = await db.getAllRecipts();
         res.status(200).json(receipts);
