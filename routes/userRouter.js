@@ -4,7 +4,8 @@ const restricted = require('../auth/authmiddleware');
 const router = express.Router();
 
 
-router.get('/', restricted ,async (req, res) => {
+//Get all Users
+router.get('/users', async (req, res) => {
 
     try {
         const users = await db.getAllUsers();
@@ -15,6 +16,8 @@ router.get('/', restricted ,async (req, res) => {
     }
 });
 
+
+//Get user by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -29,6 +32,7 @@ router.get('/:id', async (req, res) => {
 });
 
 
+// Get all Users receipts by user ID
 router.get('/:id/receipts', async (req, res) => {
     const { id } = req.params;
     try {
@@ -40,6 +44,7 @@ router.get('/:id/receipts', async (req, res) => {
     }
 });
 
+//Get all Users Reciepts by some filter 
 router.get('/:id/filterreceiptsby/:filter/:value', async (req, res) => {
     const { id, filter, value } = req.params;
     try {
@@ -51,13 +56,8 @@ router.get('/:id/filterreceiptsby/:filter/:value', async (req, res) => {
     }
 });
 
-
-router.post('user/:id/record_receipt', (req,res)=> {
-    // here we need to record a receipt and also add the category for the receipt and also add the picture so we need to do all that
-
-});
-
-router.post('/:id/recordreceiptTest', async (req, res) => {
+// Add a receipt by a User Id 
+router.post('/:id/record_receipt', async (req, res) => {
     const {id} = req.params;
     const receiptData = req.body;
     const receipt = {
@@ -67,7 +67,7 @@ router.post('/:id/recordreceiptTest', async (req, res) => {
     };
 
 try{ 
- //GET The assocate Category object      
+ //GET the associated Category object      
    const [category]= await db.getCategoryByName(receiptData.categoryName); // return the category as object use category.id
    
 //ADD the image for the recipt first if it exsists
@@ -99,6 +99,33 @@ try{
         res.status(500).json({message});
     }
    
+});
+
+//Update the User
+router.put('/updateUser/:id', async (req, res) => {
+        const { id }  = req.params;
+        const updatedUser = req.body;
+        
+        try{
+            const update = await db.updateUser(updatedUser, id);
+            res.status(200).json({message:`The user was been updated.`}); 
+        }
+        catch({message}){
+            res.status(500).json(message);
+        }
+});
+
+
+//Delete a User
+router.delete('/removeUser/:id', async (req, res) => {
+        const { id } = req.params;
+        try{
+            const deleted = await db.removeUser(id);
+            res.status(200).json({message:'The user was successfully deleted'});
+        }
+        catch({message}){
+            res.status(500).json(message);
+        }
 });
 
 

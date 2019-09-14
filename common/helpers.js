@@ -82,13 +82,50 @@ const addToReceiptsCategoryTbl = (recordFK) => {
     return db('receipts_category').insert(recordFK);
 };
 
-//POST- add a image and associate with a receipt
 //PUT- update users imformation 
+const updateUser = (updatedUser ,id) => {
+    return db('users')
+           .where({id})
+           .update(updatedUser);
+};
+
 //PUT- update a receipts information
+const updateReceipt = (updatedReceipt, id) => {
+        return db('receipts')
+                .where({id})
+                .update(updatedReceipt);
+};
+
+
 //PUT- update a categorys informaton
+const updateCategory = (updatedCategory, id) => {
+    return db('category')
+            .where({id})
+            .update(updatedCategory);
+};
+
 //DELETE - user
+const removeUser = (id) => {
+    return db('users')
+            .where({id})
+            .delete();
+};
+
 //DELETE - receipt
+const removeReceipt = (id) => {
+    return db('receipts')
+           .where({id})
+           .delete();
+};
+
+
 //DELETE - cagtegory
+const removeCategory = (id) => {
+        return db('category')
+                .where({id})
+                .delete();
+};
+
 //DELETE - image
 
 
@@ -112,5 +149,11 @@ module.exports = {
     getCategoryByName,
     addImage,
     getRImages,
-    addToReceiptsCategoryTbl
+    addToReceiptsCategoryTbl, 
+    updateCategory, 
+    removeCategory,
+    updateUser,
+    removeUser,
+    updateReceipt, 
+    removeReceipt
 };

@@ -25,7 +25,7 @@ server.use(fileUpload({
 }));
 server.use('/api/user', userRouter);
 server.use('/api/category', categoryRouter);
-server.use('/api/receipts', receiptsRouter);
+server.use('/api/receipt', receiptsRouter);
 server.use('/api/auth', registerRouter);
 
 
@@ -38,7 +38,6 @@ server.get('/images', async (req, res)=> {
         res.status(500).json(message);
     }
 });
-
 
 
 
