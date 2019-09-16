@@ -24,9 +24,9 @@ server.use(cors());
 server.use(fileUpload({
     useTempFiles: true // we need this create a temp directory to hold onto uploaded files available via express-fileupload
 }));
-server.use('/api/user', userRouter);
-server.use('/api/category', categoryRouter);
-server.use('/api/receipt', receiptsRouter);
+server.use('/api/user',restricted ,userRouter);
+server.use('/api/category',restricted ,categoryRouter);
+server.use('/api/receipt',restricted ,receiptsRouter);
 server.use('/api/auth', registerRouter);
 
 
