@@ -14,7 +14,8 @@ router.post('/register', async (req, res) => {
 
     try {
         const newUser = await db.addUser(user);
-        res.status(201).json(newUser);
+        const token = genJWT(user);
+        res.status(201).json({newUser, token});
     }
     catch ({ message }) {
         res.status(500).json(message);

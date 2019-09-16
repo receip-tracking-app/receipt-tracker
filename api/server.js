@@ -9,6 +9,7 @@ const categoryRouter = require('../routes/categoryRouter');
 const receiptsRouter = require('../routes/receiptsRouter');
 const userRouter = require('../routes/userRouter');
 const registerRouter = require('../routes/authRouter');
+const restricted = require('../auth/authmiddleware');
 
 cloudinary.config({
     cloud_name: 'dbqzzps1w',
@@ -29,10 +30,10 @@ server.use('/api/receipt', receiptsRouter);
 server.use('/api/auth', registerRouter);
 
 
-server.get('/images', async (req, res)=> {
-    try{
+server.get('/images', async (req, res) => {
+    try {
         const images = await db.getRImages();
-         res.status(200).json(images) ;
+        res.status(200).json(images);
     }
     catch ({ message }) {
         res.status(500).json(message);
@@ -82,30 +83,30 @@ server.post('/upload', async (req, res) => {
 
 const cloudinaryUpload = async (fileToUpload) => {
     var cloudinaryResult = {};
-        try {
-         if(fileToUpload){
-             await cloudinary.uploader.upload(fileToUpload, (error, results) => {
-                    if(error){
-                        console.log(error);
-                    }else{
-                        //console.log(results)
-                        cloudinaryResult = results;
-                    }
+    try {
+        if (fileToUpload) {
+            await cloudinary.uploader.upload(fileToUpload, (error, results) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    //console.log(results)
+                    cloudinaryResult = results;
+                }
             });
-         }
-        }catch(err){
-            console.log(err);
         }
-        return cloudinaryResult.url; 
+    } catch (err) {
+        console.log(err);
+    }
+    return cloudinaryResult.url;
 };
 
 
 
 server.post('/imageupload', async (req, res) => {
     const file = req.files.photo;
-   
-    const photoURL = {imageURL: await cloudinaryUpload(file.tempFilePath)}; // returns cloudinary uploaded image result URL
-    try{
+
+    const photoURL = { imageURL: await cloudinaryUpload(file.tempFilePath) }; // returns cloudinary uploaded image result URL
+    try {
         const id = await db.addImage(photoURL);
         res.status(201).json(id);
     }
